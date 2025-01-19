@@ -1,0 +1,5 @@
+.venv/
+.idea/
+__pychche__/
+logs/
+*.pyc
