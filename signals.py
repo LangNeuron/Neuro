@@ -1,12 +1,12 @@
 from queue import SimpleQueue
-import logging
+from settings.logger import get_logger
 
 class Signals:
-    # TODO: заменить print на логирование
     """
     Класс для получения информации о работе какого-то метода
     """
     def __init__(self):
+        self.logger = get_logger()
         # очередь для сохранения и выполнения задач
         self.queue = SimpleQueue()
 
@@ -43,9 +43,9 @@ class Signals:
         self._human_speaking = value
         self.queue.put(('human_speaking:', value))
         if value:
-            print('SIGNALS: Human Talking Start')
+            self.logger.info('SIGNALS: Human Talking Start')
         else:
-            print('SIGNALS: Human Talking Stop')
+            self.logger.info('SIGNALS: Human Talking Stop')
 
     @property
     def ai_thinking(self):
@@ -56,9 +56,9 @@ class Signals:
         self._ai_thinking = value
         self.queue.put(('ai_thinking:', value))
         if value:
-            print('SIGNALS: AI Thinking Start')
+            self.logger.info('SIGNALS: AI Thinking Start')
         else:
-            print('SIGNALS: AI Thinking Stop')
+            self.logger.info('SIGNALS: AI Thinking Stop')
 
 
     @property
@@ -70,9 +70,9 @@ class Signals:
         self._ai_speaking = value
         self.queue.put(('ai_speaking:', value))
         if value:
-            print('SIGNALS: AI Speaking Start')
+            self.logger.info('SIGNALS: AI Speaking Start')
         else:
-            print('SIGNALS: AI Speaking Stop')
+            self.logger.info('SIGNALS: AI Speaking Stop')
 
     @property
     def new_message(self):
@@ -82,7 +82,7 @@ class Signals:
     def new_message(self, value):
         self._new_message = value
         if value:
-            print('SIGNALS: New Message')
+            self.logger.info('SIGNALS: New Message')
 
     @property
     def tts_ready(self):
@@ -116,4 +116,4 @@ class Signals:
     def terminate(self, value):
         self._terminate = value
         if value:
-            print('SIGNALS: Terminate')
+            self.logger.info('SIGNALS: Terminate')
