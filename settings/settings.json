@@ -1,0 +1,6 @@
+{
+  "logger": {
+    "MaxBytes": 1048576,
+    "backupCount": 10
+  }
+}
