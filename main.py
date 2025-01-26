@@ -1,13 +1,14 @@
+import asyncio
+
+
 from settings.logger import get_logger
-from settings.constant import data
-from signals import Signals
-
-logger = get_logger()
+from neuro import neuro
 
 
-class Neuro:
-    pass
+async def main():
+    neuro.run()
 
 
 if __name__ == '__main__':
-    neuro = Neuro()
+    logger = get_logger()
+    asyncio.run(main())

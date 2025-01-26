@@ -1,6 +1,16 @@
 {
   "logger": {
     "MaxBytes": 1048576,
-    "backupCount": 10
+    "backupCount": 10,
+    "MaxLen": 10
+  },
+  "Web": {
+    "Name": "application",
+    "Debug": true,
+    "Host": "127.0.0.1",
+    "Port": 5000,
+    "config_object": {
+            "DEBUG": true
+        }
   }
 }

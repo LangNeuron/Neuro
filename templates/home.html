@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная страница</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4b5b5;
+            color: #000;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f2c6c6;
+            padding: 10px 20px;
+        }
+
+        header a {
+            text-decoration: none;
+            color: #555;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        main {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: calc(100vh - 120px);
+            text-align: center;
+            padding: 20px;
+        }
+
+        .info-box, .contact-box {
+            background-color: #c27d7d;
+            border-radius: 15px;
+            padding: 20px;
+            width: 300px;
+            height: 500px;
+            overflow-y: auto;
+            margin: 0 20px;
+        }
+
+        .info-box p {
+            text-align: left;
+            font-size: 16px;
+            color: #fff;
+            margin: 5px 0;
+        }
+
+        .start-btn {
+            background-color: #e74c3c;
+            color: #2ecc71;
+            font-size: 24px;
+            font-weight: bold;
+            border: none;
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            cursor: pointer;
+        }
+
+        footer {
+            background-color: #f2c6c6;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #e74c3c;
+        }
+
+        footer a {
+            color: #e74c3c;
+            text-decoration: none;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const infoBox = document.querySelector('.info-box');
+
+            setInterval(() => {
+                fetch('/update-info')
+                    .then(response => response.json())
+                    .then(data => {
+                        infoBox.innerHTML = '<p></p>';
+                        data.message.split('\n').forEach(log => {
+                            if (log.trim()) {
+                                const p = document.createElement('p');
+                                p.textContent = log;
+                                infoBox.appendChild(p);
+                            }
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Ошибка получения данных:', error);
+                    });
+            }, 5000);
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <a href="#">Логотип</a>
+        <a href="#">Настройки</a>
+        <a href="/logs">Логи</a>
+    </header>
+
+    <main>
+        <div class="info-box">
+            <p>Информация о работе</p>
+        </div>
+
+        <button class="start-btn">Старт</button>
+
+        <div class="contact-box">
+            <p>Связаться со создателем</p>
+            <p>Почта: <a href="mailto:anton1programmsit@gmail.com">anton1programmsit@gmail.com</a></p>
+        </div>
+    </main>
+
+    <footer>
+        Работает на открытом исходном коде. Создан <a href="https://github.com/LangNeuron">LANGNeuron</a> (ссылка). Распространяется под лицензией.
+    </footer>
+</body>
+</html>

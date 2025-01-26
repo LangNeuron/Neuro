@@ -1,7 +1,7 @@
 import logging
 from logging.handlers import RotatingFileHandler
 from os import mkdir, path
-
+from collections import deque
 
 levels = {
     'DEBUG': logging.DEBUG,
@@ -10,6 +10,25 @@ levels = {
     'ERROR': logging.ERROR,
     'CRITICAL': logging.CRITICAL
 }
+
+class LoggerHandler(logging.Handler):
+    def __init__(self, max_len):
+        super().__init__()
+        self.max_len = max_len
+        self.messages = deque(maxlen=max_len)
+
+    def emit(self, record):
+        try:
+            formatted_message = self.format(record)
+            self.messages.appendleft(formatted_message)
+        except Exception:
+            self.handleError(record)
+
+    @property
+    def get_last_messages(self, n=None) -> list:
+        if n is None or n > len(self.messages):
+            return list(self.messages)
+        return list(self.messages)[:n]
 
 
 def get_logger(name="app", level: str = 'INFO'):
@@ -25,13 +44,16 @@ def get_logger(name="app", level: str = 'INFO'):
         )
         # Создаем обработчик для записи в файл
         file_handler = RotatingFileHandler(
-            r"logs/app.log",
+            rf"logs/{name}.log",
             maxBytes=data["logger"]["MaxBytes"],
             backupCount=data["logger"]["backupCount"],
             encoding='utf-8'
         )
         file_handler.setFormatter(formatter)
         log.addHandler(file_handler)
+        save_messages_handler = LoggerHandler(data["logger"]["MaxLen"])
+        save_messages_handler.setFormatter(formatter)
+        log.addHandler(save_messages_handler)
         # Создаем обработчик для вывода в консоль
         console_handler = logging.StreamHandler()
         console_handler.setFormatter(formatter)
