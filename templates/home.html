@@ -27,6 +27,16 @@
             font-weight: bold;
         }
 
+        .shutdown-btn {
+            background-color: #e74c3c;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
         main {
             display: flex;
             align-items: center;
@@ -65,6 +75,18 @@
             cursor: pointer;
         }
 
+        .stop-btn {
+            background-color: #2ecc71;
+            color: #e74c3c;
+            font-size: 24px;
+            font-weight: bold;
+            border: none;
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            cursor: pointer;
+        }
+
         footer {
             background-color: #f2c6c6;
             padding: 10px 20px;
@@ -81,7 +103,68 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const infoBox = document.querySelector('.info-box');
+            const startStopButton = document.querySelector('.start-btn');
+            const shutdownButton = document.querySelector('.shutdown-btn');
 
+            // Функция для обновления состояния кнопки
+            const updateButtonState = (isRunning) => {
+                if (isRunning) {
+                    startStopButton.textContent = 'Стоп';
+                    startStopButton.classList.remove('start-btn');
+                    startStopButton.classList.add('stop-btn');
+                } else {
+                    startStopButton.textContent = 'Старт';
+                    startStopButton.classList.remove('stop-btn');
+                    startStopButton.classList.add('start-btn');
+                }
+            };
+
+            // Функция для проверки состояния работы
+            const checkStatus = () => {
+                fetch('/status')
+                    .then(response => response.json())
+                    .then(data => {
+                        updateButtonState(data.isRunning);
+                    })
+                    .catch(error => {
+                        console.error('Ошибка при проверке состояния:', error);
+                    });
+            };
+
+            // Проверяем состояние при загрузке страницы
+            checkStatus();
+
+            // Обновляем состояние каждые 5 секунд
+            setInterval(checkStatus, 5000);
+
+            // Обработчик клика по кнопке старт/стоп
+            startStopButton.addEventListener('click', () => {
+                const endpoint = startStopButton.textContent === 'Старт' ? '/start' : '/stop';
+                fetch(endpoint, { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Ответ сервера:', data);
+                        checkStatus(); // Обновляем состояние кнопки после изменения
+                    })
+                    .catch(error => {
+                        console.error('Ошибка при отправке запроса:', error);
+                    });
+            });
+
+            // Обработчик клика по кнопке выключения
+            shutdownButton.addEventListener('click', () => {
+                fetch('/shutdown', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Ответ сервера:', data);
+                        alert('Система выключается...');
+                    })
+                    .catch(error => {
+                        console.error('Ошибка при отправке запроса:', error);
+                    });
+            });
+
+            // Обновление информации о работе каждые 5 секунд
             setInterval(() => {
                 fetch('/update-info')
                     .then(response => response.json())
@@ -107,6 +190,7 @@
         <a href="#">Логотип</a>
         <a href="#">Настройки</a>
         <a href="/logs">Логи</a>
+        <button class="shutdown-btn">Выключить</button>
     </header>
 
     <main>
@@ -123,7 +207,7 @@
     </main>
 
     <footer>
-        Работает на открытом исходном коде. Создан <a href="https://github.com/LangNeuron">LANGNeuron</a> (ссылка). Распространяется под лицензией.
+        Работает на открытом исходном коде. Создан <a href="https://github.com/LangNeuron">LANGNeuron</a>. Распространяется под лицензией.
     </footer>
 </body>
 </html>
