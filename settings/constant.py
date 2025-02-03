@@ -2,8 +2,8 @@ import json
 import os
 
 
-if os.path.exists(r"settings/settings.json"):
-    with open(r"settings/settings.json", "r") as file:
+def get_data(file_name: str = "settings.json"):
+    file_path = os.path.join(os.path.dirname(__file__), file_name)
+    with open(file_path, "r", encoding="utf-8") as file:
         data = json.load(file)
-else:
-    exit(1)
+    return data

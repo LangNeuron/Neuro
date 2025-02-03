@@ -1,9 +1,8 @@
 import asyncio
 import threading
-import time
 
 
-from settings.constant import data
+from settings.constant import get_data
 from settings.logger import get_logger
 from signals import Signals
 from neuro import Neuro
@@ -11,6 +10,7 @@ from web import Web
 
 
 async def main():
+    data = get_data()
     signal = Signals()
     web = Web(data["Web"]["Name"], signal, data["Web"]["config_object"])
     neuro = Neuro(signal)
@@ -25,7 +25,7 @@ async def main():
         logger.error(e)
     finally:
         signal.terminate = True
-        time.sleep(5)
+        await asyncio.sleep(5)
         web_run.join()
         neuro_run.join()
     logger.info("Program terminated")

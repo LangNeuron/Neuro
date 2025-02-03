@@ -1,5 +1,4 @@
 from settings.logger import get_logger
-from settings.constant import data
 import time
 
 

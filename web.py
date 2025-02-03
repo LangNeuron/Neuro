@@ -4,9 +4,13 @@ from threading import Thread, Event
 from werkzeug.serving import make_server
 import webbrowser
 
-
-from settings.constant import data
+from settings.save_data import save_data
+from settings.constant import get_data
 from settings.logger import get_logger
+
+
+settings_data = get_data()
+module_data_path = "module.json"
 
 
 class Web:
@@ -22,6 +26,9 @@ class Web:
         self.setup_route()
         self.server = None
         self.server_thread = None
+        self.module_data = get_data(module_data_path)
+        self.current_settings = self.module_data["Modules"]["Settings"]
+
         self.logger.info("Web stop init")
 
     def configure_app(self, config_object) -> None:
@@ -46,8 +53,8 @@ class Web:
 
     def run(
         self,
-        host=data["Web"]["Host"],
-        port=data["Web"]["Port"],
+        host=settings_data["Web"]["Host"],
+        port=settings_data["Web"]["Port"],
     ) -> None:
         print(r"http://%s:%s" % (host, port))
         self.app_run = True
@@ -72,6 +79,29 @@ class Web:
 
     def get_last_logs(self) -> str:
         return "\n".join(self.logger.handlers[1].get_last_messages)
+
+    def _save_data(self, new_data) -> None:
+        wwd = new_data["WWD"]
+        stt = new_data["STT"]
+        tts = new_data["TTS"]
+        llm = new_data["LLM"]
+        save_data(r"module.json", ["Modules", "Settings", 0, "value"], wwd)
+        save_data(r"module.json", ["Modules", "Settings", 1, "value"], tts)
+        save_data(
+            r"module.json",
+            [
+                "Modules",
+                "Settings",
+                2,
+                "value",
+            ],
+            llm,
+        )
+        save_data(r"module.json", ["Modules", "Settings", 3, "value"], stt)
+
+        self.current_settings = self.module_data["Modules"]["Settings"]
+        print(self.current_settings)
+        print(new_data)
 
     def setup_route(self) -> None:
 
@@ -98,6 +128,13 @@ class Web:
                 title="Логи",
             )
 
+        @self.app.route("/settings")
+        def settings():
+            return render_template(
+                template_name_or_list="settings.html",
+                title="Настройки",
+            )
+
         @self.app.route("/start", methods=["POST"])
         def start():
             self.signals.neuro_run = True
@@ -120,3 +157,15 @@ class Web:
                     "isRunning": self.signals.neuro_run,
                 }
             )
+
+        @self.app.route("/api/settings", methods=["GET"])
+        def get_settings():
+            return jsonify(self.current_settings)
+
+        @self.app.route("/api/settings", methods=["POST"])
+        def save_settings():
+            self.logger.info("Web start save settings")
+            new_settings = request.json
+            self._save_data(new_settings)
+            self.logger.info("Web stop save settings")
+            return jsonify({"status": "success"})

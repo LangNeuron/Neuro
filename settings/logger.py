@@ -4,12 +4,13 @@ from os import mkdir, path
 from collections import deque
 
 levels = {
-    'DEBUG': logging.DEBUG,
-    'INFO': logging.INFO,
-    'WARNING': logging.WARNING,
-    'ERROR': logging.ERROR,
-    'CRITICAL': logging.CRITICAL
+    "DEBUG": logging.DEBUG,
+    "INFO": logging.INFO,
+    "WARNING": logging.WARNING,
+    "ERROR": logging.ERROR,
+    "CRITICAL": logging.CRITICAL,
 }
+
 
 class LoggerHandler(logging.Handler):
     def __init__(self, max_len):
@@ -31,23 +32,25 @@ class LoggerHandler(logging.Handler):
         return list(self.messages)[:n]
 
 
-def get_logger(name="app", level: str = 'INFO'):
+def get_logger(name="app", level: str = "INFO"):
     global levels
     log = logging.getLogger(name)
     if not log.hasHandlers():  # Проверяем, есть ли уже обработчики
-        from settings.constant import data
-        if not path.exists('logs'):
-            mkdir('logs')
+        from settings.constant import get_data
+
+        data = get_data()
+        if not path.exists("logs"):
+            mkdir("logs")
         log.setLevel(levels[level])
         formatter = logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
         )
         # Создаем обработчик для записи в файл
         file_handler = RotatingFileHandler(
             rf"logs/{name}.log",
             maxBytes=data["logger"]["MaxBytes"],
             backupCount=data["logger"]["backupCount"],
-            encoding='utf-8'
+            encoding="utf-8",
         )
         file_handler.setFormatter(formatter)
         log.addHandler(file_handler)
