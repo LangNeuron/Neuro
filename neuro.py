@@ -1,5 +1,8 @@
 from settings.logger import get_logger
 import time
+from module_base.wakeworddetection import WakeWordDetector
+
+config_path = "settings/module.json"
 
 
 class Neuro:
@@ -8,9 +11,9 @@ class Neuro:
         self.signals = signals
 
     def run(self):
+        detector = WakeWordDetector.from_config(config_path)
         while self.signals.terminate is False:
             while self.signals.neuro_run is True and self.signals.terminate is False:
-                self.logger.info("neuro run")
-                time.sleep(2)
+                detector.run(self.signals)
             time.sleep(1)
         self.logger.info("neuro stop")
